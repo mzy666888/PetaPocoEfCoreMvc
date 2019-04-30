@@ -96,6 +96,7 @@ namespace PetaPocoEfCoreMvc
                         builder.WithConnectionValidator(
                             c =>
                                 {
+                                    //从IServiceCollection中构建     ServiceProvider, 用以使用注入访问数据库的服务
                                     var serprovider = services.BuildServiceProvider();
                                     var us = serprovider.GetService(typeof(IUserService)) as IUserService;
                                     var x = us.GetAll();
