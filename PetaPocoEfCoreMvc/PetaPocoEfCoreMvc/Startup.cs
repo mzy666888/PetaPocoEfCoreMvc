@@ -17,6 +17,8 @@ namespace PetaPocoEfCoreMvc
 
     using Microsoft.EntityFrameworkCore;
 
+    using MQTTnet.AspNetCore;
+
     using PetaPoco;
     using PetaPoco.Providers;
 
@@ -26,12 +28,19 @@ namespace PetaPocoEfCoreMvc
     using PetaPocoEfCoreMvc.Service;
 
     using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+    using MQTTnet.Protocol;
+    using MQTTnet.Server;
+
+    using PetaPocoEfCoreMvc.Mqtts;
 
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private IServiceProvider _serviceProvider;
+
+        public Startup(IConfiguration configuration,IServiceProvider serviceProvider)
         {
             Configuration = configuration;
+            _serviceProvider = serviceProvider;
         }
 
         public IConfiguration Configuration { get; }
@@ -79,6 +88,45 @@ namespace PetaPocoEfCoreMvc
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ISampleCustomerRepository, SampleCustomerRepository>();
 
+
+            //Mqtt
+            services.AddHostedMqttServerWithServices(
+                builder =>
+                    {
+                        builder.WithDefaultEndpoint();
+                        builder.WithConnectionValidator(
+                            c =>
+                                {
+                                    var us = _serviceProvider.GetService(typeof(IUserService));
+
+                                    if (c.ClientId.Length < 5)
+                                    {
+                                        c.ReturnCode = MqttConnectReturnCode.ConnectionRefusedIdentifierRejected;
+                                        return;
+                                    }
+
+                                    if (c.Username != "admin")
+                                    {
+                                        c.ReturnCode = MqttConnectReturnCode.ConnectionRefusedBadUsernameOrPassword;
+                                        return;
+                                    }
+
+                                    if (c.Password != "admin")
+                                    {
+                                        c.ReturnCode = MqttConnectReturnCode.ConnectionRefusedBadUsernameOrPassword;
+                                        return;
+                                    }
+                                    
+                                    c.ReturnCode = MqttConnectReturnCode.ConnectionAccepted;
+                                });
+                    });
+            //this adds tcp server support based on System.Net.Socket
+            services.AddMqttTcpServerAdapter();
+            //this adds tcp server support based on Microsoft.AspNetCore.Connections.Abstractions
+            services.AddMqttConnectionHandler();
+            //this adds websocket support
+            services.AddMqttWebSocketServerAdapter();
+
             //
             var ass = Assembly.GetEntryAssembly().GetReferencedAssemblies().Select(Assembly.Load).SelectMany(y => y.DefinedTypes)
                 .Where(type => typeof(IProfile).GetTypeInfo().IsAssignableFrom(type.AsType()));
@@ -99,6 +147,8 @@ namespace PetaPocoEfCoreMvc
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            app.UseMqttEndpoint();
 
             app.UseStaticFiles();
             app.UseCookiePolicy();

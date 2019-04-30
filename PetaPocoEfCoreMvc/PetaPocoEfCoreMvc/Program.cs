@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 
 namespace PetaPocoEfCoreMvc
 {
+    using MQTTnet.AspNetCore;
+
     public class Program
     {
         public static void Main(string[] args)
@@ -18,7 +20,12 @@ namespace PetaPocoEfCoreMvc
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+            WebHost.CreateDefaultBuilder(args).UseKestrel(
+                    host =>
+                        {
+                            host.ListenAnyIP(1883,lis=>lis.UseMqtt());
+                            host.ListenAnyIP(5000);
+                        })
                 .UseStartup<Startup>();
     }
 }
