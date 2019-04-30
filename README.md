@@ -96,7 +96,6 @@ namespace PetaPocoEfCoreMvc.Models
     [TableName("Users")]
     public class User
     {
-
         public ulong Id { get; set; }
         public Guid Uid { get; set; }
         public string UserName { get; set; }
@@ -143,7 +142,6 @@ namespace PetaPocoEfCoreMvc.Models
 
         public IEnumerable<User> GetUsers()
         {
-
             Randomizer.Seed = new Random(23456789);
             var userGenerator = new Faker<User>().RuleFor(u => u.Id, f => f.Random.ULong())
                 .RuleFor(u => u.Uid, f => f.Random.Guid()).RuleFor(u => u.UserName, f => f.Name.FullName())
@@ -164,11 +162,6 @@ namespace PetaPocoEfCoreMvc.Models
  ```
  namespace PetaPocoEfCoreMvc.Profiles
 {
-    using AutoMapper;
-
-    using PetaPocoEfCoreMvc.Models;
-    using PetaPocoEfCoreMvc.Profiles.DTOs;
-
     public interface IProfile
     {
 
