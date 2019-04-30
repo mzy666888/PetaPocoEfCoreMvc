@@ -31,7 +31,6 @@ namespace PetaPocoEfCoreMvc
     using MQTTnet.Protocol;
     using MQTTnet.Server;
 
-    using PetaPocoEfCoreMvc.Mqtts;
 
     public class Startup
     {
@@ -97,8 +96,9 @@ namespace PetaPocoEfCoreMvc
                         builder.WithConnectionValidator(
                             c =>
                                 {
-                                    var us = _serviceProvider.GetService(typeof(IUserService));
-
+                                    var serprovider = services.BuildServiceProvider();
+                                    var us = serprovider.GetService(typeof(IUserService)) as IUserService;
+                                    var x = us.GetAll();
                                     if (c.ClientId.Length < 5)
                                     {
                                         c.ReturnCode = MqttConnectReturnCode.ConnectionRefusedIdentifierRejected;
