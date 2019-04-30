@@ -177,3 +177,73 @@ namespace PetaPocoEfCoreMvc.Models
 }
 
  ```
+ 
+ # [MQTTnet](https://github.com/chkr1011/MQTTnet) 
+ 添加nuget引用 ：Install-Package MQTTnet.AspNetCore -Version 3.0.0-rc2
+ 使用方法：
+ 在program中的CreateWebHostBuilder添加代码：第五行
+ ```
+ public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args).UseKestrel(
+                    host =>
+                        {
+                            host.ListenAnyIP(1883,lis=>lis.UseMqtt());
+                            host.ListenAnyIP(5000);
+                        })
+                .UseStartup<Startup>();
+ ```
+ 
+ 在Startup中添加代码：
+ 
+```
+//Mqtt
+            services.AddHostedMqttServerWithServices(
+                builder =>
+                    {
+                        builder.WithDefaultEndpoint();
+                        builder.WithConnectionValidator(
+                            c =>
+                                {
+                                    //从IServiceCollection中构建     ServiceProvider, 用以使用注入访问数据库的服务
+                                    var serprovider = services.BuildServiceProvider();
+                                    var us = serprovider.GetService(typeof(IUserService)) as IUserService;
+                                    var x = us.GetAll();
+                                    if (c.ClientId.Length < 5)
+                                    {
+                                        c.ReturnCode = MqttConnectReturnCode.ConnectionRefusedIdentifierRejected;
+                                        return;
+                                    }
+
+                                    if (c.Username != "admin")
+                                    {
+                                        c.ReturnCode = MqttConnectReturnCode.ConnectionRefusedBadUsernameOrPassword;
+                                        return;
+                                    }
+
+                                    if (c.Password != "admin")
+                                    {
+                                        c.ReturnCode = MqttConnectReturnCode.ConnectionRefusedBadUsernameOrPassword;
+                                        return;
+                                    }
+                                    
+                                    c.ReturnCode = MqttConnectReturnCode.ConnectionAccepted;
+                                });
+                    });
+            //this adds tcp server support based on System.Net.Socket
+            services.AddMqttTcpServerAdapter();
+            //this adds tcp server support based on Microsoft.AspNetCore.Connections.Abstractions
+            services.AddMqttConnectionHandler();
+            //this adds websocket support
+            services.AddMqttWebSocketServerAdapter();
+```
+
+为能在ConfigureServices中使用注入功能，特别要注意一下代码内容：
+```
+//从IServiceCollection中构建     ServiceProvider, 用以使用注入访问数据库的服务
+var serprovider = services.BuildServiceProvider();
+var us = serprovider.GetService(typeof(IUserService)) as IUserService;
+var x = us.GetAll();
+```
+
+在Configure方法中添加下面代码：
+`app.UseMqttEndpoint();`
