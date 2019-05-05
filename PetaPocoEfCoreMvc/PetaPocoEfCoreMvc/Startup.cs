@@ -128,6 +128,16 @@ namespace PetaPocoEfCoreMvc
             //this adds websocket support
             services.AddMqttWebSocketServerAdapter();
 
+            //添加内存缓存Memory
+            services.AddMemoryCache();
+
+            //添加分布式缓存RedisCache使用
+            services.AddDistributedRedisCache(
+                options =>
+                    {
+                        options.Configuration = "localhost";
+                        
+                    });
             //
             var ass = Assembly.GetEntryAssembly().GetReferencedAssemblies().Select(Assembly.Load).SelectMany(y => y.DefinedTypes)
                 .Where(type => typeof(IProfile).GetTypeInfo().IsAssignableFrom(type.AsType()));

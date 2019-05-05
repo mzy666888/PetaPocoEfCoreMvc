@@ -8,8 +8,11 @@ using PetaPocoEfCoreMvc.Models;
 
 namespace PetaPocoEfCoreMvc.Controllers
 {
+    using System.Text;
+
     using AutoMapper;
 
+    using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.Logging;
 
     using PetaPocoEfCoreMvc.BogusResp;
@@ -26,19 +29,25 @@ namespace PetaPocoEfCoreMvc.Controllers
 
         private IMapper _mapper;
 
-        public HomeController(IUserService userService,ISampleCustomerRepository customerRepository,ILogger<HomeController> logger,IMapper mapper)
+        private IDistributedCache _distributedCache;
+
+        public HomeController(IUserService userService,ISampleCustomerRepository customerRepository,ILogger<HomeController> logger,IMapper mapper,IDistributedCache distributedCache)
         {
             _userService = userService;
             _customerRepository = customerRepository;
             _logger = logger;
             _mapper = mapper;
+            _distributedCache = distributedCache;
         }
         public IActionResult Index()
         {
             var cs = _customerRepository.GetUsers();
+
+            _distributedCache.Set("mzy190505", Encoding.UTF8.GetBytes("sdriewf"));
+            _distributedCache.SetString("mzy190505001", Guid.NewGuid().ToString());
             
-            var x = _userService.GetAll();
-            return Json(_mapper.Map<IEnumerable<UserDto>>(cs));
+            //var x = _userService.GetAll();
+            return View();
         }
 
         public IActionResult Privacy()

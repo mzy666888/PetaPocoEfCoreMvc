@@ -3,17 +3,18 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    <AssemblyVersion>1904.120.0718.0</AssemblyVersion>
-    <FileVersion>1904.120.0718.0</FileVersion>
+    <AssemblyVersion>1905.125.0843.0</AssemblyVersion>
+    <FileVersion>1905.125.0843.0</FileVersion>
   </PropertyGroup>
 
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.1.0" />
-    <PackageReference Include="Bogus" Version="26.0.2" />
+    <PackageReference Include="Bogus" Version="27.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-    <PackageReference Include="MQTTnet.AspNetCore" Version="3.0.0-rc2" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
+    <PackageReference Include="MQTTnet.AspNetCore" Version="3.0.0-rc3" />
     <PackageReference Include="MySql.Data" Version="8.0.16" />
     <PackageReference Include="PetaPoco.Compiled" Version="6.0.404" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
