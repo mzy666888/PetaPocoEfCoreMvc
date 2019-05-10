@@ -15,6 +15,8 @@ namespace PetaPocoEfCoreMvc.Controllers
     using Microsoft.Extensions.Caching.Distributed;
     using Microsoft.Extensions.Logging;
 
+    using MQTTnet.Server;
+
     using PetaPocoEfCoreMvc.BogusResp;
     using PetaPocoEfCoreMvc.Profiles.DTOs;
     using PetaPocoEfCoreMvc.Service;
@@ -31,13 +33,21 @@ namespace PetaPocoEfCoreMvc.Controllers
 
         private IDistributedCache _distributedCache;
 
-        public HomeController(IUserService userService,ISampleCustomerRepository customerRepository,ILogger<HomeController> logger,IMapper mapper,IDistributedCache distributedCache)
+        private IMqttServer _mqttServer;
+
+        public HomeController(IUserService userService,
+                              ISampleCustomerRepository customerRepository,
+                              ILogger<HomeController> logger,
+                              IMapper mapper,
+                              IDistributedCache distributedCache,
+                              IMqttServer mqttServer)
         {
             _userService = userService;
             _customerRepository = customerRepository;
             _logger = logger;
             _mapper = mapper;
             _distributedCache = distributedCache;
+            _mqttServer = mqttServer;
         }
         public IActionResult Index()
         {
@@ -45,6 +55,8 @@ namespace PetaPocoEfCoreMvc.Controllers
 
             _distributedCache.Set("mzy190505", Encoding.UTF8.GetBytes("sdriewf"));
             _distributedCache.SetString("mzy190505001", Guid.NewGuid().ToString());
+
+            var x = _mqttServer.GetClientStatusAsync();
             
             //var x = _userService.GetAll();
             return View();

@@ -16,6 +16,7 @@ namespace PetaPocoEfCoreMvc
     using AutoMapper;
 
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Logging;
 
     using MQTTnet.AspNetCore;
 
@@ -36,10 +37,13 @@ namespace PetaPocoEfCoreMvc
     {
         private IServiceProvider _serviceProvider;
 
-        public Startup(IConfiguration configuration,IServiceProvider serviceProvider)
+        private ILogger<Startup> _logger;
+
+        public Startup(IConfiguration configuration,IServiceProvider serviceProvider,ILogger<Startup> logger)
         {
             Configuration = configuration;
             _serviceProvider = serviceProvider;
+            _logger = logger;
         }
 
         public IConfiguration Configuration { get; }
@@ -92,13 +96,16 @@ namespace PetaPocoEfCoreMvc
             services.AddHostedMqttServerWithServices(
                 builder =>
                     {
-                        builder.WithDefaultEndpoint();
+                        //builder.WithDefaultEndpoint();
+                        
+                        builder.WithDefaultEndpointPort(1883);
                         builder.WithConnectionValidator(
                             c =>
                                 {
                                     //从IServiceCollection中构建     ServiceProvider, 用以使用注入访问数据库的服务
                                     var serprovider = services.BuildServiceProvider();
                                     var us = serprovider.GetService(typeof(IUserService)) as IUserService;
+                                    _logger.LogInformation($" ClientId:{c.ClientId} Endpoint:{c.Endpoint} Username:{c.Username} Password:{c.Password} WillMessage:{c.WillMessage}");
                                     var x = us.GetAll();
                                     if (c.ClientId.Length < 5)
                                     {
@@ -123,8 +130,7 @@ namespace PetaPocoEfCoreMvc
                     });
             //this adds tcp server support based on System.Net.Socket
             services.AddMqttTcpServerAdapter();
-            //this adds tcp server support based on Microsoft.AspNetCore.Connections.Abstractions
-            services.AddMqttConnectionHandler();
+            
             //this adds websocket support
             services.AddMqttWebSocketServerAdapter();
 

@@ -23,7 +23,7 @@ namespace PetaPocoEfCoreMvc
             WebHost.CreateDefaultBuilder(args).UseKestrel(
                     host =>
                         {
-                            host.ListenAnyIP(1883,lis=>lis.UseMqtt());
+                            //host.ListenAnyIP(1883,lis=>lis.UseMqtt());
                             host.ListenAnyIP(5000);
                         })
                 .UseStartup<Startup>();
