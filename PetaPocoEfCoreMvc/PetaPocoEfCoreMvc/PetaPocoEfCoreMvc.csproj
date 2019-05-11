@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    <AssemblyVersion>1905.130.0520.0</AssemblyVersion>
-    <FileVersion>1905.130.0520.0</FileVersion>
+    <AssemblyVersion>1905.131.0634.0</AssemblyVersion>
+    <FileVersion>1905.131.0634.0</FileVersion>
   </PropertyGroup>
 
 
@@ -14,7 +14,7 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
-    <PackageReference Include="MQTTnet.AspNetCore" Version="3.0.0-rc3" />
+    <PackageReference Include="MQTTnet.AspNetCore" Version="3.0.0" />
     <PackageReference Include="MySql.Data" Version="8.0.16" />
     <PackageReference Include="PetaPoco.Compiled" Version="6.0.404" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />

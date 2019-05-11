@@ -93,6 +93,7 @@ namespace PetaPocoEfCoreMvc
 
 
             //Mqtt
+            //services.AddHostedMqttServer(o=>{}).AddMqttConnectionHandler().AddConnections().AddMqttTcpServerAdapter();
             services.AddHostedMqttServerWithServices(
                 builder =>
                     {
@@ -119,7 +120,7 @@ namespace PetaPocoEfCoreMvc
                                         return;
                                     }
 
-                                    if (c.Password != "admin")
+                                    if (c.Password != "public")
                                     {
                                         c.ReturnCode = MqttConnectReturnCode.ConnectionRefusedBadUsernameOrPassword;
                                         return;
@@ -127,7 +128,7 @@ namespace PetaPocoEfCoreMvc
                                     
                                     c.ReturnCode = MqttConnectReturnCode.ConnectionAccepted;
                                 });
-                    });
+                    });//.AddMqttConnectionHandler().AddConnections().AddMqttTcpServerAdapter();
             //this adds tcp server support based on System.Net.Socket
             services.AddMqttTcpServerAdapter();
             
@@ -165,6 +166,44 @@ namespace PetaPocoEfCoreMvc
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            //app.UseConnections(
+            //    c => c.MapConnectionHandler<MqttConnectionHandler>(
+            //        "/mqtt",
+            //        options =>
+            //            {
+            //                options.WebSockets.SubProtocolSelector =
+            //                    MQTTnet.AspNetCore.ApplicationBuilderExtensions.SelectSubProtocol;
+            //            }));
+
+
+            app.UseMqttServer(
+                server =>
+                    {
+                        server.StartedHandler = new MqttServerStartedHandlerDelegate((
+                            e =>
+                                {
+                                    
+                                }));
+                        server.StoppedHandler = new MqttServerStoppedHandlerDelegate(
+                            e =>
+                                {
+
+                                });
+
+                        server.ClientConnectedHandler = new MqttServerClientConnectedHandlerDelegate(
+                            e =>
+                                {
+                                    _logger.LogInformation($"{e.ClientId} is connectioned");
+                                    _logger.LogInformation($"目前连接总数:{ server.GetClientStatusAsync().Result.Count}");
+                                });
+                        server.ClientDisconnectedHandler = new MqttServerClientDisconnectedHandlerDelegate(
+                            e =>
+                                {
+                                    
+                                    _logger.LogInformation($"{e.ClientId} is disconnectioned");
+                                    _logger.LogInformation($"目前连接总数:{ server.GetClientStatusAsync().Result.Count}");
+                                });
+                    });
             app.UseMqttEndpoint();
 
             app.UseStaticFiles();

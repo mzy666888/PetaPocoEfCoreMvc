@@ -59,7 +59,7 @@ namespace PetaPocoEfCoreMvc.Controllers
             var x = _mqttServer.GetClientStatusAsync();
             
             //var x = _userService.GetAll();
-            return View();
+            return Json(x.Result);
         }
 
         public IActionResult Privacy()
